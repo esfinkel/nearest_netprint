@@ -8,6 +8,9 @@
 When run on command line, prints a list of the nearest netprint-enabled printers offered by Cornell.
     -You can specify type of printer with argvs 'color' or 'bw'.
     -If you do not specify, you will receive lists for both.
+As a courtesy, I've left my key in the code (toward the bottom, variable name `key`).
+    -If you're doing more than a handful of requests, please, please, get your own.
+    -You can get one for free at https://ipstack.com/product
 Requires internet access but no other input.
 Note that, as building hours have not yet been inputted, printers suggested to you may be in buildings that are closed.
     -Building hours can typically be manually checked via Google Maps or departmental websites.
@@ -200,9 +203,10 @@ printers_color = [
 ############################
 
 
-def find_me():
+def find_me(key):
     '''returns user's coordinates - still pretty imprecise!'''
-    send_url = "http://api.ipstack.com/check?access_key=5458b0ab5799bb832c995cb32879cb85"
+    # API from https://ipstack.com/documentation
+    send_url = 'http://api.ipstack.com/check?access_key='+key
     geo_req = requests.get(send_url)
     geo_json = json.loads(geo_req.text)
     latitude = geo_json['latitude']
@@ -255,10 +259,11 @@ def print_answer(dists):
         print('Option '+str(i+1)+': go to printer \''+dists[i][0]+'\', which is '+str(dists[i][1])+' km away and probably open.\n')
 
 if __name__ == '__main__':
-    pos = find_me()
+    key = '5458b0ab5799bb832c995cb32879cb85'
+    if len(key) == 0:
+        key = prompt('API key? (can get for free at https://ipstack.com/product) : ')
+    pos = find_me(key)
     from sys import argv
-    #print(argv)
-    #print('length',len(argv))
     if (len(argv) == 2) and (argv[1].lower() in ['color','bw','black and white','black-and-white']):
         if argv[1].lower() in ['bw','black and white','black-and-white']:
             answer_bw = min_dist(printers_bw,pos)
@@ -275,32 +280,3 @@ if __name__ == '__main__':
         print_answer(answer_color)
         
 
-
-
-#############################################################################################
-
-# Some calls to very inaccurate APIs, which I discarded:
-
-'''
-from gps3.agps3threaded import AGPS3mechanism
-
-agps_thread = AGPS3mechanism()  # This instantiate the mechanism, as I believe it's called.
-
-from gps3 import agps3
-gpsd_socket = agps3.GPSDSocket()
-data_stream = agps3.DataStream()
-
-agps_thread.stream_data()    #  Stream the data from host, port, devicepath.
-agps_thread.run_thread()  #  Iterate stream as a thread with throttle control for empty look ups.
-# I don't think this one even works
-'''
-
-'''
-#find user position
-import geocoder
-g = geocoder.ip('me')
-lat = g.lat
-lon = g.lng
-'''
-
-#############################################################################################
