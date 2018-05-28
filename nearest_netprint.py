@@ -12,49 +12,14 @@ Requires internet access but no other input.
 Note that, as building hours have not yet been inputted, printers suggested to you may be in buildings that are closed.
     -Building hours can typically be manually checked via Google Maps or departmental websites.
     -If anyone knows an API for that, let me know. Or try it yourself.
+Note also that, as most of the coordinates were extracted from another API, some of them are likely wrong.
+    -Feel free to correct those errors as they arise.
 '''
 
 
 import requests
 import json
 from math import radians, cos, sin, asin, sqrt
-
-
-# Some calls to very inaccurate APIs, which I discarded:
-
-'''
-from gps3.agps3threaded import AGPS3mechanism
-
-agps_thread = AGPS3mechanism()  # This instantiate the mechanism, as I believe it's called.
-
-from gps3 import agps3
-gpsd_socket = agps3.GPSDSocket()
-data_stream = agps3.DataStream()
-
-agps_thread.stream_data()    #  Stream the data from host, port, devicepath.
-agps_thread.run_thread()  #  Iterate stream as a thread with throttle control for empty look ups.
-# I don't think this one even works
-'''
-
-'''
-#find user position
-import geocoder
-g = geocoder.ip('me')
-lat = g.lat
-lon = g.lng
-'''
-
-
-def find_me():
-    '''returns user's coordinates - still pretty imprecise!'''
-    send_url = "http://api.ipstack.com/check?access_key=5458b0ab5799bb832c995cb32879cb85"
-    geo_req = requests.get(send_url)
-    geo_json = json.loads(geo_req.text)
-    latitude = geo_json['latitude']
-    longitude = geo_json['longitude']
-    return (latitude,longitude)
-
-
 
 
 # for each printer, store (0: name, 1: text-form location, 2: bw or color info, 3: decimal latitude, 4: decimal longitude, 5: will add schedule)
@@ -232,9 +197,17 @@ printers_color = [
 
 ]
 
+############################
 
-#############################
 
+def find_me():
+    '''returns user's coordinates - still pretty imprecise!'''
+    send_url = "http://api.ipstack.com/check?access_key=5458b0ab5799bb832c995cb32879cb85"
+    geo_req = requests.get(send_url)
+    geo_json = json.loads(geo_req.text)
+    latitude = geo_json['latitude']
+    longitude = geo_json['longitude']
+    return (latitude,longitude)
 
 def gc_dist(lat_1,lon_1,lat_2,lon_2):
     '''find distance (in km) between any two great circle points'''
@@ -264,8 +237,8 @@ def min_dist(printers,me_pos):
         lat = float(printer[3])
         lon = float(printer[4])
         newdist = gc_dist(me_pos[0],me_pos[1],lat,lon)
-        #if available(schedule):
-        dists.append((printer[1],newdist))    #just this line indented
+        if available(''): # argument should be printer[5]
+            dists.append((printer[1],newdist))
         dists.sort(key=(lambda x: x[1]))
         if len(dists)>5:
             dists.pop()
@@ -275,7 +248,6 @@ def min_dist(printers,me_pos):
 def available(schedule):
     '''returns True if printer is available; currently inoperable. must add schedules to dataframe.'''
     return True
-    pass
 
 def print_answer(dists):
     '''Prints answer'''
@@ -302,3 +274,33 @@ if __name__ == '__main__':
         print('\n\ncolor printers:\n')
         print_answer(answer_color)
         
+
+
+
+#############################################################################################
+
+# Some calls to very inaccurate APIs, which I discarded:
+
+'''
+from gps3.agps3threaded import AGPS3mechanism
+
+agps_thread = AGPS3mechanism()  # This instantiate the mechanism, as I believe it's called.
+
+from gps3 import agps3
+gpsd_socket = agps3.GPSDSocket()
+data_stream = agps3.DataStream()
+
+agps_thread.stream_data()    #  Stream the data from host, port, devicepath.
+agps_thread.run_thread()  #  Iterate stream as a thread with throttle control for empty look ups.
+# I don't think this one even works
+'''
+
+'''
+#find user position
+import geocoder
+g = geocoder.ip('me')
+lat = g.lat
+lon = g.lng
+'''
+
+#############################################################################################
