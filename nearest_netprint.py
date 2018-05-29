@@ -8,10 +8,12 @@
 When run on command line, prints a list of the nearest netprint-enabled printers offered by Cornell.
     -You can specify type of printer with argvs 'color' or 'bw'.
     -If you do not specify, you will receive lists for both.
+    -Your GPS location is computed automatically.
+        -If you think it's inaccurate, use argv 'gps' to be prompted for manual coordinate entry.
 As a courtesy, I've left my key in the code (toward the bottom, variable name `key`).
     -If you're doing more than a handful of requests, please, please, get your own.
     -You can get one for free at https://ipstack.com/product
-Requires internet access but no other input.
+Requires internet access.
 Note that, as building hours have not yet been inputted, printers suggested to you may be in buildings that are closed.
     -Building hours can typically be manually checked via Google Maps or departmental websites.
     -If anyone knows an API for that, let me know. Or try it yourself.
@@ -258,17 +260,26 @@ def print_answer(dists):
     for i in range(len(dists)):
         print('Option '+str(i+1)+': go to printer \''+dists[i][0]+'\', which is '+str(dists[i][1])+' km away and probably open.\n')
 
+def color(args):
+    return not set(args).isdisjoint(['color','c'])
+
+def bw(args):
+    return not set(args).isdisjoint(['bw','black and white','black-and-white'])
+
 if __name__ == '__main__':
     key = '5458b0ab5799bb832c995cb32879cb85'
     if len(key) == 0:
         key = prompt('API key? (can get for free at https://ipstack.com/product) : ')
     pos = find_me(key)
     from sys import argv
-    if (len(argv) == 2) and (argv[1].lower() in ['color','bw','black and white','black-and-white']):
-        if argv[1].lower() in ['bw','black and white','black-and-white']:
+    args = [i.lower() for i in argv]
+    if 'gps' in args:
+        pos = [float(i) for i in input('Enter your coordinates (comma separation): ').split(',')]
+    if len(args) > 1 and (bw(args) or color(args)):
+        if bw(args):
             answer_bw = min_dist(printers_bw,pos)
             print_answer(answer_bw)
-        elif argv[1].lower() == 'color':
+        elif color(args):
             answer_color = min_dist(printers_color,pos)
             print_answer(answer_color)            
     else:
