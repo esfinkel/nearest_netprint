@@ -10,7 +10,7 @@ As a courtesy, I've left my key in the code (toward the bottom, variable name `k
     -If you're doing more than a handful of requests, please, please, get your own.
     -You can get one for free at https://ipstack.com/product
 
-Requires internet access but no other input.
+Requires internet access; will prompt for coordinates.
 
 Note that, as building hours have not yet been inputted, printers suggested to you may be in buildings that are closed.
     -Building hours can typically be manually checked via Google Maps or departmental websites.
