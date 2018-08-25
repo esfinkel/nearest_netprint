@@ -71,7 +71,6 @@ printers_bw = [
     ['kroch-lib1','Kroch Library - 1st floor Asia reading room','campus-bw, campus-color','42.4477741','-76.4841596'],
     ['laprinter2','Kennedy Hall - Room 467','campus-bw','42.4482603','-76.4793974'],
     ['law-lib1','Law Library - 3rd floor','campus-bw','42.4438549','-76.48577239999997'],
-    ['lrc1','Noyes Lodge - Beebe Lake','campus-bw','42.4521329','-76.4802752'],
     ['mann1/mann2/mann3','Mann Library - First Floor','campus-bw, campus-color','42.4487577','-76.47631179999999'],
     ['mann6','Mann Library - 2nd Floor','campus-bw, campus-color','42.448766','-76.47631179999999'],
     ['math-lib2','Mallott Hall - Math Library - Fourth Floor','campus-bw','42.4482224','-76.4802083'],
