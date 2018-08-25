@@ -11,10 +11,10 @@ When run on command line, prints a list of the nearest netprint-enabled printers
     -You will then be prompted for GPS coordinates.
         -You can use argv 'auto' for your GPS location to be computed automatically.
         -Precision of automatic computations is poor at best.
-As a courtesy, I've left my access key in the code (toward the bottom, variable name `key`).
+As a courtesy, I've left my autogps access key in the code (toward the bottom, variable name `key`).
     -If you're doing more than a handful of requests, please, please, get your own.
     -You can get one for free at https://ipstack.com/product
-Requires internet access.
+    -Auto functionality requires internet access.
 Note that, as building hours have not yet been inputted, printers suggested to you may be in buildings that are closed.
     -Building hours can typically be manually checked via Google Maps or departmental websites.
     -If anyone knows an API/program for that, let me know. Or try it yourself.
