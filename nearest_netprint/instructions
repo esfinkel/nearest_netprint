@@ -1,0 +1,35 @@
+Requires Google Chrome to work. Designed for (any recent) Mac OS and Python 3.7.0.
+
+There are additional requirements. You need some python packages:
+
+math
+time
+webbrowser (if you want to do manual GPS entry)
+selenium (if you want your GPS position to be found automatically)
+
+Some of those packages come with python. If you receive an error saying you don't have a particular one, try typing "pip install PACKAGE_NAME" into terminal. If you receive an error saying you don't have python installed, go to https://www.python.org/downloads/mac-osx/ and install the latest version.
+
+Be sure that file "chromedriver" is in the same folder as nearest_netprint.py
+If you're on Mac and the program doesn't work as is, you may need to redownload chromedriver from https://sites.google.com/a/chromium.org/chromedriver/home.
+
+To run on mac:
+Open "terminal".
+On the terminal tab that opens, type "python " (with the space).
+Then drag the file "nearest_netprint.py" into the terminal tab, and drop it under what you wrote. (Doing so does NOT move the file. It just autotypes the file info.)
+Press enter. Wait.
+
+A chrome window will open. I (the person who wrote nearest_netprint.py) am not hacking you. I will not receive your location, or any other information. Python isn't designed for precise GPS work, so asking the internet is the easiest way for the program to get your GPS coordinates.
+
+After doing the drag-drop and before pressing enter, you can specify search parameters. These are all optional, can be combined, and can come in any order.
+
+For instance, "python FILE/PATH/nearest.netprint.py 10 color" is a valid command to send terminal.
+
+
+
+"manual" disables auto-GPS searching. Do this if the auto-GPS function isn't working. You will instead be prompted to enter your own coordinates.
+
+"color" Only color printers are displayed.
+
+"bw" Only black-and-white printers are displayed
+
+Type any integer between 1 and 50. That many printers will be displayed (per type).
