@@ -27,7 +27,7 @@ import time
 import webbrowser
 
 
-# for each printer, store (0: name, 1: text-form location, 2: bw or color info, 3: decimal latitude, 4: decimal longitude, 5: will add schedule)
+# for each printer, store (0: name, 1: text-form location, 2: bw or color info, 3: decimal latitude, 4: decimal longitude, 5: schedule)
 # for schedule: {0:[,],1:[,],2:[,],3:[,],4:[,],5:[,],6:[,]} where monday is 0
 
 ############################
@@ -170,9 +170,9 @@ printers_color = [
 
 ############################
 
-
+'''Deprecated; function (and access key in __main__) left here for others' curiosity.'''
 def find_me(key):
-    '''returns user's coordinates - still pretty imprecise!'''
+    '''returns user's coordinates - very imprecise!'''
     # API from https://ipstack.com/documentation
     send_url = 'http://api.ipstack.com/check?access_key='+key
     geo_req = requests.get(send_url)
@@ -182,6 +182,7 @@ def find_me(key):
     return (latitude,longitude)
 
 def find_me2():
+    '''Automatically open a Chrome window and extract GPS information.'''
     import selenium
     from selenium import webdriver
     from selenium.webdriver.common.keys import Keys
@@ -205,7 +206,7 @@ def find_me2():
 
 
 def gc_dist(lat_1,lon_1,lat_2,lon_2):
-    '''find distance (in km) between any two great circle points'''
+    '''find great circle distance (in km) between any two points'''
     # convert decimal degrees to radians 
     lat_1, lon_1, lat_2, lon_2 = map(radians, [lat_1, lon_1, lat_2, lon_2])
     # haversine formula 
@@ -221,12 +222,12 @@ def gc_dist(lat_1,lon_1,lat_2,lon_2):
 def min_dist(printers,me_pos,num_printers):
     '''
     for every printer:
-        1. finds printer location
-        2. adds printer to list
-        3. sorts printer and removes 
-    returns list of length num_printers
+        1. find printer location
+        2. add printer to list
+        3. sort printers and remove one if necessary
+    return the list (with length num_printers)
     '''
-    # fake distance for debugging - if code is successful, '' printer should not be printed
+    # fake distance for debugging - if code is successful, printer with name '' should not be printed to console
     dists = [('',10000000000000,True,None)]
     for printer in printers:
         lat = float(printer[3])
@@ -242,7 +243,10 @@ def min_dist(printers,me_pos,num_printers):
     return dists
 
 def available(schedule):
-    '''returns True if printer is available; currently inoperable. must add schedules to dataframe. defaults to True.'''
+    '''return value of: printer's building is open. defaults to True.'''
+    # TODO: schedules need to be manually entered, and many haven't.
+    # --schedule information for cornell buildings is not centrally compiled, nor stored online in any standardized way
+    #
     # schedule has format {0:[9.0,18.0],1:[8,19],...} or {0:[,],1:[,],2:[,],3:[,],4:[,],5:[,],6:[,]} where monday is 0
     date = time.localtime().tm_wday #date in eastern time
     hour = time.localtime().tm_hour+(time.localtime().tm_min)/60
@@ -253,7 +257,7 @@ def available(schedule):
         return ('maybe',None)
 
 def print_answer(dists):
-    '''Prints answer'''
+    '''Print answer'''
     for i in range(len(dists)):
         if str(dists[i][2]) == 'True':
             second_part = 'is open. It closes in about ' + str(dists[i][3]) + ' minutes.\n'
@@ -263,10 +267,12 @@ def print_answer(dists):
         print('Option '+str(i+1)+': go to printer \''+dists[i][0]+'\', which is '+str(dists[i][1])+' km away and ' + second_part)
     
 def color(args):
+    # return value of: user wants color printers
     # apparently this is fastest syntax - see https://stackoverflow.com/questions/3170055/test-if-lists-share-any-items-in-python
     return not set(args).isdisjoint(['color','c'])
 
 def bw(args):
+    # return value of: user wants bw printers
     return not set(args).isdisjoint(['bw','black and white','black-and-white'])
 
 
@@ -274,6 +280,8 @@ if __name__ == '__main__':
     from sys import argv
     from sys import exit
     args = [i.lower() for i in argv]
+    
+    # num_printers is the only numerical argv, so any int is num_printers. defaults to 5.
     NUM_PRINTERS_WANTED = 5
     for i in args:
         try:
@@ -282,20 +290,22 @@ if __name__ == '__main__':
                 NUM_PRINTERS_WANTED = 5
         except:
             pass
-    #print(argv)
-    #print('length',len(argv))
+ 
+    # find user coordinates
     if any('manual' in x for x in args):
         webbrowser.open_new("https://www.gps-coordinates.net/")
         pos = [float(i.strip()) for i in input('Enter your coordinates (comma separation)\ntry https://www.gps-coordinates.net/\n0 to cancel\nCoors: ').split(',')]
+        if pos == [0]:
+            exit()
     else:
         print('Searching for GPS info - please wait a few seconds.\nIf browser requests any permissions, accept; otherwise don\'t touch computer.')
-        poss = find_me2()
-        if poss is None:
+        pos = find_me2()
+        # give up if selenium error occurs
+        if pos is None:
             import sys
             sys.exit(0)
-        #print(poss)
         print('Found!')
-        pos = [float(i) for i in poss.split(',')]
+        pos = [float(i) for i in pos.split(',')]
     '''except:
         key = '5458b0ab5799bb832c995cb32879cb85'
         if len(key) == 0:
@@ -304,19 +314,17 @@ if __name__ == '__main__':
     '''
     if pos == [0]:
         exit()
+    
+    # wait a moment for dramatic effect; then perform distance calculations; then print answers in desired format
     time.sleep(1)
-    if len(args) > 1 and (bw(args) or color(args)):
-        if bw(args):
-            answer_bw = min_dist(printers_bw,pos,NUM_PRINTERS_WANTED)
-            print_answer(answer_bw)
-        elif color(args):
-            answer_color = min_dist(printers_color,pos,NUM_PRINTERS_WANTED)
-            print_answer(answer_color)            
-    else:
-        answer_bw = min_dist(printers_bw,pos,NUM_PRINTERS_WANTED)
-        answer_color = min_dist(printers_color,pos,NUM_PRINTERS_WANTED)
+    if bw(args):
         print('black-and-white printers:\n')
+        answer_bw = min_dist(printers_bw,pos,NUM_PRINTERS_WANTED)
         print_answer(answer_bw)
-        print('\n\ncolor printers:\n')
+    if bw(args) and color(args):
+        print('\n\n')
+    if color(args):
+        print('color printers:\n')
+        answer_color = min_dist(printers_color,pos,NUM_PRINTERS_WANTED)
         print_answer(answer_color)
-        
+    
