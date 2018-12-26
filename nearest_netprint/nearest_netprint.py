@@ -1,16 +1,16 @@
-# nearest_netprint.py ZIP version
+# nearest_netprint.py
 # by Elisabeth Finkel (finkelelisabeth@gmail.com ; esf76@cornell.edu)
 # written May 28, 2018
-# last modified Sep 2, 2018
-# free for personal use/distribution; do give me credits if you're feelin' it
+# last modified Dec 25, 2018
+# free for personal use/distribution, ideally with these credits intact
 
 '''
+
 When run on command line, prints a list of the nearest netprint-enabled printers offered by Cornell.
     -You can specify type of printer with argvs 'color' or 'bw'.
     -If you do not specify, you will receive lists for both.
-    -You can specify number of printers with an int argv in 1...50. Default is 5.
     -Your GPS location is computed automatically - if you think it's inaccurate, use argv 'manual' to be prompted for manual coord entry
-Requires internet access but no user input.
+Requires internet access but no other input.
 Note that, as building hours have not yet been inputted, printers suggested to you may be in buildings that are closed.
     -Building hours can typically be manually checked via Google Maps or departmental websites.
     -If anyone knows an API for that, let me know. Or try it yourself.
@@ -18,8 +18,13 @@ Note also that, as most of the coordinates were extracted from another API, some
     -Feel free to correct those errors as they arise.
 '''
 
+
+import requests
+import json
 from math import radians, cos, sin, asin, sqrt
+import datetime
 import time
+import webbrowser
 
 
 # for each printer, store (0: name, 1: text-form location, 2: bw or color info, 3: decimal latitude, 4: decimal longitude, 5: will add schedule)
@@ -35,7 +40,7 @@ printers_bw = [
     ['aap-sib-4bw','Sibley Hall - 3rd Floor Balcony (inside dome)','campus-bw, campus-color','42.4509802','-76.4840158',None],
     ['aap-tjaden-1bw','Tjaden Hall - Darkroom','campus-bw, campus-color','42.4509025','-76.4853131',None],
     ['afr-lib1','Africana Library','campus-bw, campus-color','42.4573916','-76.4822137',{0:[9,23],1:[9,23],2:[9,23],3:[9,23],4:[9,17],5:[13,17],6:[16,23]}],
-    ['appel1','Appel Commons Community Center - 1st Floor','campus-bw','42.45592449999999','-76.4774412',{0:[9,22],1:[9,22],2:[9,22],3:[9,22],4:[9,22],5:[11,22],6:[12,22]}],
+    ['appel1','Appel Commons Community Center - 1st Floor','campus-bw',42.4535925,-76.4764187,{0:[9,22],1:[9,22],2:[9,22],3:[9,22],4:[9,22],5:[11,22],6:[12,22]}],
     ['becker-nprint1','Becker House - Room G39 - Computer Lab - North wing - Ground floor','campus-bw','42.448204','-76.4894583',None],
     ['becker-nprint2','Becker House - Computer lab - North wing - Ground floor Room# G39','campus-bw','42.448204','-76.4894583',None],
     ['bin1','Statler Hall 365 - by the lab monitor desk - fourth from window','campus-bw','42.4454727','-76.48206789999999',None],
@@ -44,15 +49,15 @@ printers_bw = [
     ['catherwood-lnge','Catherwood Library - 136 Ives Hall - First Floor Lounge','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['catherwood-np1/catherwood-np2/catherwood-np3','Catherwood Library - 236 Ives Hall - Reference Area','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['cisuglab','Gates Hall - Room G33','campus-bw','42.4449769','-76.4810912',None],
-    ['cit-carp-1bw/cit-carp-3bw','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.4856319','-76.4663403',None],
-    ['cit-carp-4bw/cit-carp-5bw','Carpenter Hall Computer Lab - Second Floor Hallway','campus-bw, campus-color','42.4856319','-76.4663403',None],
+    ['cit-carp-1bw/cit-carp-3bw','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.4856319','-76.4663403',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
+    ['cit-carp-4bw/cit-carp-5bw','Carpenter Hall Computer Lab - Second Floor Hallway','campus-bw, campus-color','42.4856319','-76.4663403',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
     ['cit-mann220a-1bw/cit-mann220a-2bw','Mann Library Computer Lab - Room 220A - Second Floor','campus-bw, campus-color','42.448766','-76.4763118',None],
     ['cit-ph318-1bw/cit-ph318-2bw','Phillips Hall Computer Lab - Room 318','campus-bw, campus-color','42.4445768','-76.4820529',None],
     ['cit-rpcc-1bw/cit-rpcc-2bw','Robert Purcell Community Center - RPCC - Computer Lab - Room 207','campus-bw, campus-color','42.4562967','-76.4783146',{0:[9,23.99],1:[9,23.99],2:[9,23.99],3:[9,23.99],4:[9,23.99],5:[11,23.99],6:[12,23.99]}],
     ['cit-surge-1bw','Ag Quad - Academic Surge B - Room 159','campus-bw, campus-color','42.4488081','-76.4780298',None],
     ['cit-upson-1bw/cit-upson-2bw','Upson Hall - Room 225','campus-bw, campus-color','42.4439852','-76.4828736',None],
-    ['cit-uris-1bw/cit-uris-2bw','Uris Library - Tower Room Computer Lab - Downstairs from Entrance','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['cit-uris-3bw','Uris Library - Electronic Classroom - Room B05','campus-bw, campus-color','42.447905','-76.484293',None],
+    ['cit-uris-1bw/cit-uris-2bw','Uris Library - Tower Room Computer Lab - Downstairs from Entrance','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
+    ['cit-uris-3bw','Uris Library - Electronic Classroom - Room B05','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
     ['cit-wsh-1bw/cit-wsh-2bw','Willard Straight Hall - Computer Lab - Basement Level','campus-bw, campus-color','42.4465919','-76.4856765',None],
     ['ciw2','District of Columbia - Cornell in Washington','campus-bw, campus-color','42.4358405','-76.493497',None],
     ['cook-nprint1','Alice Cook House - Computer Lab','campus-bw','42.4489805','-76.4896109',None],
@@ -61,13 +66,13 @@ printers_bw = [
     ['gs3','Goldwin Smith Hall – Room 213','campus-bw','42.44907329999999','-76.4835344',None],
     ['hollister1','Hollister 202 CEE Undergrad Lounge','campus-bw','42.4443332','-76.4847092',None],
     ['house5','Rose House - Computer Lab - Room# 110','campus-bw','42.4477928','-76.4888006',None],
-    ['ilr-lab1/ilr-lab2','Ives Hall - Room 118 - Computer Lab','campus-bw, campus-color','42.4472571','-76.4811162',None],
+    ['ilr-lab1/ilr-lab2','Ives Hall - Room 118 - Computer Lab','campus-bw, campus-color','42.4472571','-76.4811162',{0:[8,23],1:[8,23],2:[8,23],3:[8,23],4:[8,17],5:[0,0],6:[14,23]}],
     ['keeton-nprint1','Keeton House - Room 151 - Computer Lab','campus-bw','42.4467158','-76.4894902',None],
-    ['kroch-lib1','Kroch Library - 1st floor Asia reading room','campus-bw, campus-color','42.4477741','-76.4841596',None],
+    ['kroch-lib1','Kroch Library - 1st floor Asia reading room','campus-bw, campus-color','42.4477741','-76.4841596',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
     ['laprinter2','Kennedy Hall - Room 467','campus-bw','42.4482603','-76.4793974',None],
-    ['law-lib1','Law Library - 3rd floor','campus-bw','42.4438549','-76.48577239999997',None],
-    ['mann1/mann2/mann3','Mann Library - First Floor','campus-bw, campus-color','42.4487577','-76.47631179999999',None],
-    ['mann6','Mann Library - 2nd Floor','campus-bw, campus-color','42.448766','-76.47631179999999',None],
+    ['law-lib1','Law Library - 3rd floor','campus-bw','42.4438549','-76.48577239999997',{0:[8,20],1:[8,20],2:[8,20],3:[8,20],4:[8,17],5:[11,17],6:[12,20]}],
+    ['mann1/mann2/mann3','Mann Library - First Floor','campus-bw, campus-color','42.4487577','-76.47631179999999',{0:[8,24],1:[8,24],2:[8,24],3:[8,24],4:[8,18],5:[12,19],6:[12,24]}],
+    ['mann6','Mann Library - 2nd Floor','campus-bw, campus-color','42.448766','-76.47631179999999',{0:[8,24],1:[8,24],2:[8,24],3:[8,24],4:[8,18],5:[12,19],6:[12,24]}],
     ['math-lib2','Mallott Hall - Math Library - Fourth Floor','campus-bw','42.4482224','-76.4802083',{0:[8,20],1:[8,20],2:[8,20],3:[8,20],4:[8,20],5:[0,0],6:[13,22]}],
     ['mcfaddin1/mcfaddin2','McFaddin - Room G22 - Computer Lab','campus-bw','42.447337', '-76.487931',None],
     ['morrison-1','Morrison Hall - Animal Science Undergraduate Student Lounge - Room 140','campus-bw','42.446309','-76.469368',None],
@@ -78,27 +83,27 @@ printers_bw = [
     ['mth-lawreview','Myron Taylor Hall Law Review Office','campus-bw','42.444460','-76.486113',None],
     ['mth-studentorg','Myron Taylor Hall Student Organizations Office','campus-bw','42.444460','-76.486113',None],
     ['music-lib1','Music Library - 3rd floor Lincoln Hall','campus-bw, campus-color','42.4501817','-76.4833675',{0:[9.0,22.0],1:[9.0,22.0],2:[9.0,22.0],3:[9.0,22.0],4:[9.0,17.0],5:[12.0,5.0],6:[14.0,22.0]}],
-    ['olin-lib1/olin-lib2/olin-lib3/olin-lib4','Olin Library - behind the reference desk','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['olin-lib6','Olin Library - B12','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['olin-lib7','Olin Library - 5th floor Grad Study','campus-bw, campus-color','42.447905','-76.484293',None],
+    ['olin-lib1/olin-lib2/olin-lib3/olin-lib4','Olin Library - behind the reference desk','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
+    ['olin-lib6','Olin Library - B12','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
+    ['olin-lib7','Olin Library - 5th floor Grad Study','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
     ['orie-netprint2/orie-netprint3','Rhodes Hall - Room 453','campus-bw',42.4433613,-76.4812668,None],
     ['physci-lib1','Clark Hall - Physical Sciences Library','campus-bw, campus-color','42.4497606','-76.4812001',{0:[0,1000],1:[0,1000],2:[0,1000],3:[0,1000],4:[0,1000],5:[0,1000],6:[0,1000]}],
     ['sage-205/sage-205-bw2','Sage Hall - Room 205 Suite - Next to Dean\'s Office','campus-bw, campus-color','42.4458918','-76.4833009',None],
     ['sage-301-bw','Sage Hall Library - Room 301 - Third Floor Collaboration Space','campus-bw, campus-color','42.4458947','-76.4832581',None],
     ['sage-basement-a/sage-basement-b','Sage Hall - Basement - Near Student Mailboxes','campus-bw','42.4458918','-76.4833009',None],
-    ['sage-lib1-bw/sage-lib2-bw','Sage Hall - Library - First Floor','campus-bw','42.4458918','-76.4833009',None],
+    ['sage-lib1-bw/sage-lib2-bw','Sage Hall - Library - First Floor','campus-bw','42.4458918','-76.4833009',{0:[7,21],1:[7,21],2:[7,21],3:[7,21],4:[7,21],5:[7,21],6:[7,21]}],
     ['schwartz1','Schwartz Center - Second Floor - Near elevator','campus-bw',42.4424328,-76.4859273,None],
     ['sha-grad1','Statler Hall G0032','campus-bw',42.4668288,-76.4851556,None],
-    ['sha-mslc-front1/sha-mslc-front2/sha-mslc-front3','Nestle Library - west side of reference desk','campus-bw',42.446092,-76.4815932,None],
+    ['sha-mslc-front1/sha-mslc-front2/sha-mslc-front3','Nestle Library - west side of reference desk','campus-bw',42.446092,-76.4815932,{0:[8,23.5],1:[8,23.5],2:[8,23.5],3:[8,23.5],4:[8,18.5],5:[12,18.5],6:[12,23.5]}],
     ['sha-mslc-lounge','Statler Hall Ground Floor Student Lounge - North side of room','campus-bw',42.4668288,-76.4851556,None],
     ['sha-mslc-quick','Nestle Library - by the standup "Quick Print" stations','campus-bw',42.446092,-76.4815932,None],
     ['snee-netprint1','Snee Hall Student Lounge','campus-bw','42.443653','-76.484938',None],
     ['tatkon1','South Balch Hall - Tatkon Center - Front Desk','campus-bw','42.453212','-76.479392',{0:[8,23],1:[8,23],2:[8,23],3:[8,23],4:[8,17.5],5:[0,0],6:[15,23]}],
-    ['uris-lib1','Uris Library - In Front of Circulation Desk','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['uris-lib3','Uris Library - Austen Room','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['uris-lib5','Uris Library - CL3 Lab','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['vetlib2','Schurman Hall - S1201','campus-color','42.4480179','-76.4661765',None],
-    ['vetlib3','Schurman Hall - S1201','campus-bw','42.4480179','-76.4661765',None],
+    ['uris-lib1','Uris Library - In Front of Circulation Desk','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
+    ['uris-lib3','Uris Library - Austen Room','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
+    ['uris-lib5','Uris Library - CL3 Lab','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
+    ['vetlib2','Schurman Hall - S1201','campus-color','42.4480179','-76.4661765',{0:[7.5,23],1:[7.5,23],2:[7.5,23],3:[7.5,23],4:[7.5,20],5:[10,20],6:[10,23]}],
+    ['vetlib3','Schurman Hall - S1201','campus-bw','42.4480179','-76.4661765',{0:[7.5,23],1:[7.5,23],2:[7.5,23],3:[7.5,23],4:[7.5,20],5:[10,20],6:[10,23]}],
     ['vm-bilinski-01','Bilinski Lab','campus-bw','42.4799809','-76.4511259',None],
     ['vm-wiswall-01/vm-wiswall-02','Wiswall Lab','campus-bw','42.4799809','-76.4511259',None],
     ['whitelab','White Hall - Room B10','campus-bw','42.4502416','-76.4853705',None]
@@ -120,34 +125,34 @@ printers_color = [
     ['bin-color','Statler Hall 365 - by the lab monitor desk - closest to window','campus-bw, campus-color',42.4668288,-76.4851556,None],
     ['catherwood-library1','Catherwood Library','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['catherwood-np4c','Catherwood Library - 236 Ives Hall - Reference Area','campus-bw, campus-color','42.4472562','-76.4811158',None],
-    ['cbs-olin-basement-2c','Olin Library','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['cit-carp-2c','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.4856319','-76.4663403',None],
-    ['cit-mann220a-3c','Mann Library Computer Lab - Room 220A - Second Floor','campus-bw, campus-color','42.448766','-76.476312',None],
+    ['cbs-olin-basement-2c','Olin Library','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
+    ['cit-carp-2c','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.4856319','-76.4663403',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
+    ['cit-mann220a-3c','Mann Library Computer Lab - Room 220A - Second Floor','campus-bw, campus-color','42.448766','-76.476312',{0:[8,24],1:[8,24],2:[8,24],3:[8,24],4:[8,18],5:[12,19],6:[12,24]}],
     ['cit-ph318-3c','Phillips Hall Computer Lab - Room 318','campus-bw, campus-color','42.4445768','-76.4820529',None],
     ['cit-rpcc-3c','Robert Purcell Community Center - RPCC - Computer Lab - Room 207','campus-bw, campus-color','42.4562967','-76.4783146',{0:[9,23.99],1:[9,23.99],2:[9,23.99],3:[9,23.99],4:[9,23.99],5:[11,23.99],6:[12,23.99]}],
     ['cit-upson-3c','Upson Hall - Room 225','campus-bw, campus-color','42.4439852','-76.4828736',None],
-    ['cit-uris-4c','Uris Library - Tower Room Computer Lab - Downstairs from Entrance','campus-bw, campus-color','42.447905','-76.484293',None],
+    ['cit-uris-4c','Uris Library - Tower Room Computer Lab - Downstairs from Entrance','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
     ['cit-weill-1c','B25 Weill Hall - 237 Tower Road','campus-bw, campus-color','42.4468068','-76.477214',None],
     ['cit-wsh-3c','Willard Straight Hall - Computer Lab - Basement Level','campus-bw, campus-color','42.4465919','-76.4856765',None],
     ['ciw1','District of Columbia - Cornell in Washington','campus-bw, campus-color','38.908422','-77.048536',None],
     ['csmenglab','Gates Hall - Room G23','campus-bw, campus-color','42.4449769','-76.4810912',None],
-    #['fine-lib2c','Fine Arts Library - B56 Sibley Hall','campus-bw, campus-color','42.4512236','-76.4828622',None],
+    #['fine-lib2c','Fine Arts Library - B56 Sibley Hall','campus-bw, campus-color','42.4512236','-76.4828622',{0:[9,19],1:[9,19],2:[9,19],3:[9,19],4:[9,17],5:[12,17],6:[13,19]}],
     ['hollister2c','Hollister 202 CEE Undergrad Lounge','campus-bw, campus-color','42.444368','-76.48463919999999',None],
-    ['kroch-lib-2-mfp/kroch-lib-3-mfp','Kroch Library','campus-bw, campus-color','42.447774','-76.484160',None],
+    ['kroch-lib-2-mfp/kroch-lib-3-mfp','Kroch Library','campus-bw, campus-color','42.447774','-76.484160',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
     ['lacolor1','Kennedy Hall - Room 467','campus-bw, campus-color','42.4482603','-76.4793974',None],
-    ['law-mfp1','Law','campus-bw, campus-color','42.4438549','-76.48577239999997',None],
+    ['law-mfp1','Law','campus-bw, campus-color','42.4438549','-76.48577239999997',{0:[8,20],1:[8,20],2:[8,20],3:[8,20],4:[8,17],5:[11,17],6:[12,20]}],
     ['lincoln-2floor','lincoln-second floor','campus-bw, campus-color','42.4501817','-76.4833675',{0:[9.0,22.0],1:[9.0,22.0],2:[9.0,22.0],3:[9.0,22.0],4:[9.0,17.0],5:[12.0,5.0],6:[14.0,22.0]}],
-    ['mann-mfp1/mann-mfp2','Mann','campus-bw, campus-color','42.448766','-76.47631179999999',None],
-    ['mann4c','Mann Library - First Floor','campus-bw, campus-color','42.448766','-76.47631179999999',None],
-    ['mann5color','Mann Library - Basement B30 Area','campus-bw, campus-color','42.448766','-76.47631179999999',None],
+    ['mann-mfp1/mann-mfp2','Mann','campus-bw, campus-color','42.448766','-76.47631179999999',{0:[8,24],1:[8,24],2:[8,24],3:[8,24],4:[8,18],5:[12,19],6:[12,24]}],
+    ['mann4c','Mann Library - First Floor','campus-bw, campus-color','42.448766','-76.47631179999999',{0:[8,24],1:[8,24],2:[8,24],3:[8,24],4:[8,18],5:[12,19],6:[12,24]}],
+    ['mann5color','Mann Library - Basement B30 Area','campus-bw, campus-color','42.448766','-76.47631179999999',{0:[8,22],1:[8,22],2:[8,22],3:[8,22],4:[8,17],5:[0,0],6:[0,0]}],
     ['math-lib3c','Mallott Hall - Math Library - Fourth Floor','campus-bw, campus-color','42.4482224','-76.4802083',{0:[8,20],1:[8,20],2:[8,20],3:[8,20],4:[8,20],5:[0,0],6:[13,22]}],
     ['mpslab','Gates Hall - Room G23','campus-bw, campus-color','42.4449769','-76.4810912',None],
     ['mth-color','Myron Taylor Hall 2nd Floor Computer Lab','campus-bw, campus-color','42.444460','-76.486113',None],
     ['nytech-netprnt1','Roosevelt Island - Bloomberg Center Room 181','campus-color','40.76050310000001','-73.9509934',None],
     ['nytech-netprnt2','NYTech - 111 8th Avenue','campus-color','42.4439614','-76.5018807',None],
-    ['olin-lib-4thfloor','Olin Library - Room 425 - Fourth Floor','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['olin-lib-gradlounge','Olin Library Graduate Lounge','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['olin-lib5c','Olin Library - behind the reference desk','campus-bw, campus-color','42.447905','-76.484293',None],
+    ['olin-lib-4thfloor','Olin Library - Room 425 - Fourth Floor','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
+    ['olin-lib-gradlounge','Olin Library Graduate Lounge','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
+    ['olin-lib5c','Olin Library - behind the reference desk','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
     ['sage-301-color','Sage Hall Library - Room 302 - Third Floor Collaboration Space','campus-bw, campus-color','42.4458947','-76.4832581',None],
     ['sage-lib1-color','Sage Hall - Library - First Floor','campus-bw, campus-color','42.4458918','-76.4833009',None],
     ['sage-mfp1','Sage Johnson First Floor Room 101','campus-bw, campus-color','42.4458947','-76.4832581',None],
@@ -156,23 +161,33 @@ printers_color = [
     ['sha-mslc-color','Nestle Library - west side of reference desk','campus-bw, campus-color','42.445541','-76.48215429999999',None],
     ['sibley1-b56','Sibley','campus-bw, campus-color','42.4509802','-76.4840158',None],
     ['sips-ps170-1c','Plant Science Building - Room 170','campus-bw, campus-color','42.4483258','-76.4770262',None],
-    ['uris-lib-mfp1','Uris Library Austen Room','campus-bw, campus-color','42.447905','-76.484293',None],
-    ['uris-lib2c','Uris Library - In Front of Circulation Desk','campus-bw, campus-color','42.447905','-76.484293',None],
+    ['uris-lib-mfp1','Uris Library Austen Room','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
+    ['uris-lib2c','Uris Library - In Front of Circulation Desk','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
     ['vetlib5','Schurman Hall - S1201','campus-bw, campus-color','42.4480179','-76.4661765',None],
-    ['vetschool-library1','Vet School Library','campus-bw, campus-color','42.4474921','-76.4658424',None]
+    ['vetschool-library1','Vet School Library','campus-bw, campus-color','42.4474921','-76.4658424',{0:[7.5,23],1:[7.5,23],2:[7.5,23],3:[7.5,23],4:[7.5,20],5:[10,20],6:[10,23]}]
 
 ]
 
 ############################
 
+
+def find_me(key):
+    '''returns user's coordinates - still pretty imprecise!'''
+    # API from https://ipstack.com/documentation
+    send_url = 'http://api.ipstack.com/check?access_key='+key
+    geo_req = requests.get(send_url)
+    geo_json = json.loads(geo_req.text)
+    latitude = geo_json['latitude']
+    longitude = geo_json['longitude']
+    return (latitude,longitude)
+
 def find_me2():
     import selenium
-    import os
     from selenium import webdriver
     from selenium.webdriver.common.keys import Keys
-    #print(os.getcwd()+'/chromedriver')
-    try:
-        with webdriver.Chrome(executable_path=os.getcwd()+'/chromedriver') as driver:
+    import os
+    with webdriver.Chrome(str(os.getcwd())+'/chromedriver') as driver:
+        try:
             driver.get('https://www.gps-coordinates.net/')
             latlong = ''
             while latlong == '':
@@ -181,9 +196,13 @@ def find_me2():
                 latlong = elem.get_attribute('value')
                 print('...')
             driver.close()
-    except:
-        latlong = None
-    return latlong
+            return latlong
+        except:
+            print('Error finding your location. Check your internet connection.\nYou can also enter your coordinate manually (argv "manual")')
+            driver.close()
+            return
+
+
 
 def gc_dist(lat_1,lon_1,lat_2,lon_2):
     '''find distance (in km) between any two great circle points'''
@@ -259,24 +278,30 @@ if __name__ == '__main__':
     for i in args:
         try:
             NUM_PRINTERS_WANTED = int(i)
-            if not 0 < NUM_PRINTERS_WANTED < 51:
+            if not 0 < NUM_PRINTERS_WANTED < 50:
                 NUM_PRINTERS_WANTED = 5
         except:
             pass
     #print(argv)
     #print('length',len(argv))
     if any('manual' in x for x in args):
-        import webbrowser
         webbrowser.open_new("https://www.gps-coordinates.net/")
-        pos = [float(i) for i in input('Enter your coordinates (comma separation)\ntry https://www.gps-coordinates.net/\nor call module with argv "auto" for a very-inaccurate automatic gps calculation\n0 to cancel\nCoors: ').split(',')]
-    else: ## deleted the try/except block with the inaccurate API call
-        print('Searching for GPS info - please wait a few seconds.')
-        pos = find_me2()
-        if pos == None:
-            print('Error finding your location. Check your internet connection.\nYou can also enter your coordinate manually (argv "manual")')
-            exit()
+        pos = [float(i.strip()) for i in input('Enter your coordinates (comma separation)\ntry https://www.gps-coordinates.net/\n0 to cancel\nCoors: ').split(',')]
+    else:
+        print('Searching for GPS info - please wait a few seconds.\nIf browser requests any permissions, accept; otherwise don\'t touch computer.')
+        poss = find_me2()
+        if poss is None:
+            import sys
+            sys.exit(0)
+        #print(poss)
         print('Found!')
-        pos = [float(i) for i in pos.split(',')]
+        pos = [float(i) for i in poss.split(',')]
+    '''except:
+        key = '5458b0ab5799bb832c995cb32879cb85'
+        if len(key) == 0:
+            key = prompt('API key? (can get for free at https://ipstack.com/product) : ')
+        pos = find_me(key)
+    '''
     if pos == [0]:
         exit()
     time.sleep(1)
