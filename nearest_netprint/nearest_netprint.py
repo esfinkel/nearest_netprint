@@ -181,27 +181,30 @@ def find_me(key):
     longitude = geo_json['longitude']
     return (latitude,longitude)
 
-def find_me2():
-    '''Automatically open a Chrome window and extract GPS information.'''
+def find_me2(browser='S'):
+    '''Automatically open a Safari/Chrome window and extract GPS information.'''
     import selenium
     from selenium import webdriver
     from selenium.webdriver.common.keys import Keys
     import os
-    with webdriver.Chrome(str(os.getcwd())+'/chromedriver') as driver:
-        try:
-            driver.get('https://www.gps-coordinates.net/')
-            latlong = ''
-            while latlong == '':
-                time.sleep(1)
-                elem = driver.find_element_by_id('latlong')
-                latlong = elem.get_attribute('value')
-                print('...')
-            driver.close()
-            return latlong
-        except:
-            print('Error finding your location. Check your internet connection.\nYou can also enter your coordinate manually (argv "manual")')
-            driver.close()
-            return
+    if browser=='S':
+        driver = webdriver.Safari()
+    else:
+        import os
+        driver = webdriver.Chrome(str(os.getcwd())+'/chromedriver')
+    try:
+        driver.get('https://www.gps-coordinates.net/')
+        latlong = ''
+        while latlong == '':
+            time.sleep(1)
+            elem = driver.find_element_by_id('latlong')
+            latlong = elem.get_attribute('value')
+            print('...')
+        driver.close()
+        return latlong
+    except:
+        print('Error finding your location. Check your internet connection.\nYou can also enter your coordinate manually (argv "manual")')
+        driver.close()
 
 
 
@@ -299,7 +302,11 @@ if __name__ == '__main__':
             exit()
     else:
         print('Searching for GPS info - please wait a few seconds.\nIf browser requests any permissions, accept; otherwise don\'t touch computer.')
-        pos = find_me2()
+        if 'chrome' in args:
+            pos = find_me2(browser='C')
+        else:
+            pos = find_me2()
+            
         # give up if selenium error occurs
         if pos is None:
             import sys
@@ -312,18 +319,16 @@ if __name__ == '__main__':
             key = prompt('API key? (can get for free at https://ipstack.com/product) : ')
         pos = find_me(key)
     '''
-    if pos == [0]:
-        exit()
     
     # wait a moment for dramatic effect; then perform distance calculations; then print answers in desired format
     time.sleep(1)
-    if bw(args):
+    if bw(args) or not color(args):
         print('black-and-white printers:\n')
         answer_bw = min_dist(printers_bw,pos,NUM_PRINTERS_WANTED)
         print_answer(answer_bw)
     if bw(args) and color(args):
         print('\n\n')
-    if color(args):
+    if color(args) or not bw(args):
         print('color printers:\n')
         answer_color = min_dist(printers_color,pos,NUM_PRINTERS_WANTED)
         print_answer(answer_color)

@@ -1,7 +1,6 @@
-Requires Google Chrome to work. Designed for (any recent) Mac OS and Python 3.7.0.
+Requires Safari (or Google Chrome) to work. Designed for (any recent) Mac OS and Python 3.7.0.
 
 There are additional requirements. You need some python packages:
-
 math
 time
 webbrowser (if you want to do manual GPS entry)
@@ -9,8 +8,9 @@ selenium (if you want your GPS position to be found automatically)
 
 Some of those packages come with python. If you receive an error saying you don't have a particular one, try typing "pip install PACKAGE_NAME" into terminal. If you receive an error saying you don't have python installed, go to https://www.python.org/downloads/mac-osx/ and install the latest version.
 
-Be sure that file "chromedriver" is in the same folder as nearest_netprint.py
-If you're on Mac and the program doesn't work as is, you may need to redownload chromedriver from https://sites.google.com/a/chromium.org/chromedriver/home.
+Defaults to Safari.
+To use Safari, you must enable the 'Allow Remote Automation' option in Safari's Develop menu. If you're paranoid like me, remember to disable remote automation once the program is done.
+To use Chrome, add argv "chrome". Be sure that file "chromedriver" is in the same folder as nearest_netprint.py. If you're on Mac and the program doesn't work as is, you may need to redownload chromedriver from https://sites.google.com/a/chromium.org/chromedriver/home.
 
 To run on mac:
 Open "terminal".
