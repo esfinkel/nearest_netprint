@@ -33,7 +33,7 @@ import webbrowser
 ############################
 
 printers_bw = [
-    
+
     #['aap-nyc-1bw','NYTech','campus-bw, campus-color','40.7558','-73.9562',None],
     ['aap-sib-1bw','Sibley Hall - 3rd Floor Lab (Barclay Jones)','campus-bw, campus-color','42.4509802','-76.4840158',None],
     ['aap-sib-3bw','Sibley Hall - 2nd Floor Lab (ADMS)','campus-bw, campus-color','42.4509802','-76.4840158',None],
@@ -49,8 +49,8 @@ printers_bw = [
     ['catherwood-lnge','Catherwood Library - 136 Ives Hall - First Floor Lounge','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['catherwood-np1/catherwood-np2/catherwood-np3','Catherwood Library - 236 Ives Hall - Reference Area','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['cisuglab','Gates Hall - Room G33','campus-bw','42.4449769','-76.4810912',None],
-    ['cit-carp-1bw/cit-carp-3bw','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.4856319','-76.4663403',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
-    ['cit-carp-4bw/cit-carp-5bw','Carpenter Hall Computer Lab - Second Floor Hallway','campus-bw, campus-color','42.4856319','-76.4663403',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
+    ['cit-carp-1bw/cit-carp-3bw','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.444767','-76.484124',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
+    ['cit-carp-4bw/cit-carp-5bw','Carpenter Hall Computer Lab - Second Floor Hallway','campus-bw, campus-color','42.444767','-76.484124',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
     ['cit-mann220a-1bw/cit-mann220a-2bw','Mann Library Computer Lab - Room 220A - Second Floor','campus-bw, campus-color','42.448766','-76.4763118',None],
     ['cit-ph318-1bw/cit-ph318-2bw','Phillips Hall Computer Lab - Room 318','campus-bw, campus-color','42.4445768','-76.4820529',None],
     ['cit-rpcc-1bw/cit-rpcc-2bw','Robert Purcell Community Center - RPCC - Computer Lab - Room 207','campus-bw, campus-color','42.4562967','-76.4783146',{0:[9,23.99],1:[9,23.99],2:[9,23.99],3:[9,23.99],4:[9,23.99],5:[11,23.99],6:[12,23.99]}],
@@ -126,7 +126,7 @@ printers_color = [
     ['catherwood-library1','Catherwood Library','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['catherwood-np4c','Catherwood Library - 236 Ives Hall - Reference Area','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['cbs-olin-basement-2c','Olin Library','campus-bw, campus-color','42.447905','-76.484293',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
-    ['cit-carp-2c','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.4856319','-76.4663403',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
+    ['cit-carp-2c','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.444767','-76.484124',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
     ['cit-mann220a-3c','Mann Library Computer Lab - Room 220A - Second Floor','campus-bw, campus-color','42.448766','-76.476312',{0:[8,24],1:[8,24],2:[8,24],3:[8,24],4:[8,18],5:[12,19],6:[12,24]}],
     ['cit-ph318-3c','Phillips Hall Computer Lab - Room 318','campus-bw, campus-color','42.4445768','-76.4820529',None],
     ['cit-rpcc-3c','Robert Purcell Community Center - RPCC - Computer Lab - Room 207','campus-bw, campus-color','42.4562967','-76.4783146',{0:[9,23.99],1:[9,23.99],2:[9,23.99],3:[9,23.99],4:[9,23.99],5:[11,23.99],6:[12,23.99]}],
@@ -210,13 +210,13 @@ def find_me2(browser='S'):
 
 def gc_dist(lat_1,lon_1,lat_2,lon_2):
     '''find great circle distance (in km) between any two points'''
-    # convert decimal degrees to radians 
+    # convert decimal degrees to radians
     lat_1, lon_1, lat_2, lon_2 = map(radians, [lat_1, lon_1, lat_2, lon_2])
-    # haversine formula 
-    dlon = lon_2 - lon_1 
+    # haversine formula
+    dlon = lon_2 - lon_1
     dlat = lat_2 - lat_1
     a = sin(dlat/2)**2 + cos(lat_1) * cos(lat_2) * sin(dlon/2)**2
-    c = 2 * asin(sqrt(a)) 
+    c = 2 * asin(sqrt(a))
     km = 6367 * c
     #end of calculation
     #limit decimals
@@ -268,7 +268,7 @@ def print_answer(dists):
             second_part = 'might be open.\n'
         time.sleep(0.1)
         print('Option '+str(i+1)+': go to printer \''+dists[i][0]+'\', which is '+str(dists[i][1])+' km away and ' + second_part)
-    
+
 def color(args):
     # return value of: user wants color printers
     # apparently this is fastest syntax - see https://stackoverflow.com/questions/3170055/test-if-lists-share-any-items-in-python
@@ -283,7 +283,7 @@ if __name__ == '__main__':
     from sys import argv
     from sys import exit
     args = [i.lower() for i in argv]
-    
+
     # num_printers is the only numerical argv, so any int is num_printers. defaults to 5.
     NUM_PRINTERS_WANTED = 5
     for i in args:
@@ -293,7 +293,7 @@ if __name__ == '__main__':
                 NUM_PRINTERS_WANTED = 5
         except:
             pass
- 
+
     # find user coordinates
     if any('manual' in x for x in args):
         webbrowser.open_new("https://www.gps-coordinates.net/")
@@ -306,7 +306,7 @@ if __name__ == '__main__':
             pos = find_me2(browser='C')
         else:
             pos = find_me2()
-            
+
         # give up if selenium error occurs
         if pos is None:
             import sys
@@ -319,7 +319,7 @@ if __name__ == '__main__':
             key = prompt('API key? (can get for free at https://ipstack.com/product) : ')
         pos = find_me(key)
     '''
-    
+
     # wait a moment for dramatic effect; then perform distance calculations; then print answers in desired format
     time.sleep(1)
     if bw(args) or not color(args):
@@ -332,4 +332,3 @@ if __name__ == '__main__':
         print('color printers:\n')
         answer_color = min_dist(printers_color,pos,NUM_PRINTERS_WANTED)
         print_answer(answer_color)
-    
