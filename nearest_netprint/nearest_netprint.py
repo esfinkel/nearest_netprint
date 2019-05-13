@@ -6,16 +6,21 @@
 
 '''
 
-When run on command line, prints a list of the nearest netprint-enabled printers offered by Cornell.
-    -You can specify type of printer with argvs 'color' or 'bw'.
-    -If you do not specify, you will receive lists for both.
-    -Your GPS location is computed automatically - if you think it's inaccurate, use argv 'manual' to be prompted for manual coord entry
+When run on command line, prints a list of the nearest netprint-enabled printers
+    offered by Cornell.
+    - You can specify type of printer with argvs 'color' or 'bw'.
+    - If you do not specify, you will receive lists for both.
+    - Your GPS location is computed automatically - if you think it's inaccurate,
+      use argv 'manual' to be prompted for manual coord entry
 Requires internet access but no other input.
-Note that, as building hours have not yet been inputted, printers suggested to you may be in buildings that are closed.
-    -Building hours can typically be manually checked via Google Maps or departmental websites.
-    -If anyone knows an API for that, let me know. Or try it yourself.
-Note also that, as most of the coordinates were extracted from another API, some of them are likely wrong.
-    -Feel free to correct those errors as they arise.
+Note that, as building hours have not yet been inputted, printers suggested to
+    you may be in buildings that are closed.
+    - Building hours can typically be manually checked via Google Maps or
+      departmental websites.
+    - If anyone knows an API for that, let me know. Or try it yourself.
+Note also that, as most of the coordinates were extracted from another API,
+    some of them are likely wrong.
+    - Feel free to correct those errors as they arise.
 '''
 
 
@@ -57,7 +62,7 @@ printers_bw = [
     ['cit-upson-1bw/cit-upson-2bw','Upson Hall - Room 225','campus-bw, campus-color','42.4439852','-76.4828736',None],
     ['cit-uris-1bw/cit-uris-2bw','Uris Library - Tower Room Computer Lab - Downstairs from Entrance','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
     ['cit-uris-3bw','Uris Library - Electronic Classroom - Room B05','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
-    ['cit-wsh-1bw/cit-wsh-2bw','Willard Straight Hall - Computer Lab - Basement Level','campus-bw, campus-color','42.4465919','-76.4856765',None],
+    ['cit-wsh-1bw/cit-wsh-2bw','Willard Straight Hall - Computer Lab - Basement Level','campus-bw, campus-color','42.4465919','-76.4856765',{0:[9,16],1:[9,16],2:[9,16],3:[9,16],4:[9,16],5:[0,-1],6:[0,-1]}],
     ['ciw2','District of Columbia - Cornell in Washington','campus-bw, campus-color','42.4358405','-76.493497',None],
     ['cook-nprint1','Alice Cook House - Computer Lab','campus-bw','42.4489805','-76.4896109',None],
     ['dss-mps-lab1','MPS Statistics computing lab room Mallot 301A - card reader door access for MPS students only','campus-bw','42.4479101','-76.4800518',None],
@@ -134,7 +139,7 @@ printers_color = [
     ['cit-upson-3c','Upson Hall - Room 225','campus-bw, campus-color','42.4439852','-76.4828736',None],
     ['cit-uris-4c','Uris Library - Tower Room Computer Lab - Downstairs from Entrance','campus-bw, campus-color','42.447905','-76.484293',{0:[8,25],1:[8,25],2:[8,25],3:[8,25],4:[8,21],5:[12,21],6:[10,25]}],
     ['cit-weill-1c','B25 Weill Hall - 237 Tower Road','campus-bw, campus-color','42.4468068','-76.477214',None],
-    ['cit-wsh-3c','Willard Straight Hall - Computer Lab - Basement Level','campus-bw, campus-color','42.4465919','-76.4856765',None],
+    ['cit-wsh-3c','Willard Straight Hall - Computer Lab - Basement Level','campus-bw, campus-color','42.4465919','-76.4856765',{0:[9,16],1:[9,16],2:[9,16],3:[9,16],4:[9,16],5:[0,-1],6:[0,-1]}],
     ['ciw1','District of Columbia - Cornell in Washington','campus-bw, campus-color','38.908422','-77.048536',None],
     ['csmenglab','Gates Hall - Room G23 (direct print; card reader?)','campus-bw, campus-color','42.4449769','-76.4810912',None],
     #['fine-lib2c','Fine Arts Library - B56 Sibley Hall','campus-bw, campus-color','42.4512236','-76.4828622',{0:[9,19],1:[9,19],2:[9,19],3:[9,19],4:[9,17],5:[12,17],6:[13,19]}],
@@ -205,7 +210,8 @@ def find_me2(browser='S'):
         driver.close()
         return latlong
     except:
-        print('Error finding your location. Check your internet connection.\nYou can also enter your coordinate manually (argv "manual")')
+        print('Error finding your location. Check your internet connection.\n'+
+                'You can also enter your coordinate manually (argv "manual")')
         driver.close()
 
 
@@ -232,7 +238,8 @@ def min_dist(printers,me_pos,num_printers):
         3. sort printers and remove one if necessary
     return the list (with length num_printers)
     '''
-    # fake distance for debugging - if code is successful, printer with name '' should not be printed to console
+    # fake distance for debugging - if code is successful, printer with name ''
+    # should not be printed to console
     dists = [('',10000000000000,True,None)]
     for printer in printers:
         lat = float(printer[3])
@@ -250,9 +257,11 @@ def min_dist(printers,me_pos,num_printers):
 def available(schedule):
     '''return value of: printer's building is open. defaults to True.'''
     # TODO: schedules need to be manually entered, and many haven't.
-    # --schedule information for cornell buildings is not centrally compiled, nor stored online in any standardized way
+    # --schedule information for cornell buildings is not centrally compiled,
+    #   nor stored online in any standardized way
     #
-    # schedule has format {0:[9.0,18.0],1:[8,19],...} or {0:[,],1:[,],2:[,],3:[,],4:[,],5:[,],6:[,]} where monday is 0
+    # schedule has format {0:[9.0,18.0],1:[8,19],...} or
+    #          {0:[,],1:[,],2:[,],3:[,],4:[,],5:[,],6:[,]} where monday is 0
     date = time.localtime().tm_wday #date in eastern time
     hour = time.localtime().tm_hour+(time.localtime().tm_min)/60
     try:
@@ -269,7 +278,8 @@ def print_answer(dists):
         else:
             second_part = 'might be open.\n'
         time.sleep(0.1)
-        print('Option '+str(i+1)+': go to printer \''+dists[i][0]+'\', which is '+str(dists[i][1])+' km away and ' + second_part)
+        print('Option '+str(i+1)+': go to printer \''+dists[i][0]+
+                '\', which is '+str(dists[i][1])+' km away and ' + second_part)
 
 def color(args):
     # return value of: user wants color printers
@@ -299,11 +309,15 @@ if __name__ == '__main__':
     # find user coordinates
     if any('manual' in x for x in args):
         webbrowser.open_new("https://www.gps-coordinates.net/")
-        pos = [float(i.strip()) for i in input('Enter your coordinates (comma separation)\ntry https://www.gps-coordinates.net/\n0 to cancel\nCoors: ').split(',')]
+        prompt = 'Enter your coordinates (comma separation)\n'+
+            'try https://www.gps-coordinates.net/\n0 to cancel\nCoors: '
+        pos = [float(i.strip()) for i in input(prompt).split(',')]
         if pos == [0]:
             exit()
     else:
-        print('Searching for GPS info - please wait a few seconds.\nIf browser requests any permissions, accept; otherwise don\'t touch computer.')
+        msg = 'Searching for GPS info - please wait a few seconds.'
+        msg += '\nIf browser requests any permissions, accept; otherwise don\'t touch computer.'
+        print(msg)
         if 'chrome' in args:
             pos = find_me2(browser='C')
         else:
