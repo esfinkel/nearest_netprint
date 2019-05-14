@@ -309,8 +309,8 @@ if __name__ == '__main__':
     # find user coordinates
     if any('manual' in x for x in args):
         webbrowser.open_new("https://www.gps-coordinates.net/")
-        prompt = 'Enter your coordinates (comma separation)\n'+
-            'try https://www.gps-coordinates.net/\n0 to cancel\nCoors: '
+        prompt = 'Enter your coordinates (comma separation)'
+        prompt += '\ntry https://www.gps-coordinates.net/\n0 to cancel\nCoors: '
         pos = [float(i.strip()) for i in input(prompt).split(',')]
         if pos == [0]:
             exit()
