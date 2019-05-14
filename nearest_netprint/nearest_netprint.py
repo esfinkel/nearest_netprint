@@ -279,7 +279,7 @@ def print_answer(dists):
             second_part = 'might be open.\n'
         time.sleep(0.1)
         print('Option '+str(i+1)+': go to printer \''+dists[i][0]+
-                '\', which is '+str(dists[i][1])+' km away and ' + second_part)
+                '\', which is '+str(round(dists[i][1],2))+' km away and ' + second_part)
 
 def color(args):
     # return value of: user wants color printers
