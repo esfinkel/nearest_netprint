@@ -42,7 +42,7 @@ printers_bw = [
     ['aap-sib-1bw','Sibley Hall - 3rd Floor Lab (Barclay Jones)','campus-bw, campus-color','42.4509802','-76.4840158',None],
     ['aap-sib-3bw','Sibley Hall - 2nd Floor Lab (ADMS) (direct print; card reader?)','campus-bw, campus-color','42.4509802','-76.4840158',None],
     ['aap-sib-4bw','Sibley Hall - 3rd Floor Balcony (inside dome) (direct print; card reader?)','campus-bw, campus-color','42.4509802','-76.4840158',None],
-    ['aap-tjaden-1bw','Tjaden Hall - Darkroom (direct print; card reader?)','campus-bw, campus-color','42.4509025','-76.4853131',None],
+    ['aap-tjaden-1bw','Tjaden Hall - Take elev. to 2W (direct print or card reader)','campus-bw, campus-color','42.4509025','-76.4853131',None],
     ['afr-lib1','Africana Library','campus-bw, campus-color','42.4573916','-76.4822137',{0:[9,23],1:[9,23],2:[9,23],3:[9,23],4:[9,17],5:[13,17],6:[16,23]}],
     ['appel1','Appel Commons Community Center - 1st Floor','campus-bw',42.4535925,-76.4764187,{0:[9,22],1:[9,22],2:[9,22],3:[9,22],4:[9,22],5:[11,22],6:[12,22]}],
     ['becker-nprint1','Becker House - Room G39 - Computer Lab - North wing - Ground floor','campus-bw','42.448204','-76.4894583',None],
@@ -52,7 +52,7 @@ printers_bw = [
     ['bin3','Statler Hall 365 - by the lab monitor desk - second from window','campus-bw','42.4454727','-76.48206789999999',None],
     ['catherwood-lnge','Catherwood Library - 136 Ives Hall - First Floor Lounge','campus-bw, campus-color','42.4472562','-76.4811158',None],
     ['catherwood-np1/catherwood-np2/catherwood-np3','Catherwood Library - 236 Ives Hall - Reference Area','campus-bw, campus-color','42.4472562','-76.4811158',None],
-    ['cisuglab','Gates Hall - Room G33 (direct print; card reader?)','campus-bw','42.4449769','-76.4810912',None],
+    ['cisuglab','Gates Hall - Room G33 (CS majors/staff only. direct print; no card reader?)','campus-bw','42.4449769','-76.4810912',None],
     ['cit-carp-1bw/cit-carp-3bw','Carpenter Hall Computer Lab - Main Floor','campus-bw, campus-color','42.444767','-76.484124',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
     ['cit-carp-4bw/cit-carp-5bw','Carpenter Hall Computer Lab - Second Floor Hallway','campus-bw, campus-color','42.444767','-76.484124',{0:[0,600],1:[0,600],2:[0,600],3:[0,600],4:[0,600],5:[0,600],6:[0,600]}],
     ['cit-mann220a-1bw/cit-mann220a-2bw','Mann Library Computer Lab - Room 220A - Second Floor','campus-bw, campus-color','42.448766','-76.4763118',None],
@@ -112,7 +112,7 @@ printers_bw = [
     ['vetlib3','Schurman Hall - S1201 (direct print; card reader?)','campus-bw','42.4480179','-76.4661765',{0:[7.5,23],1:[7.5,23],2:[7.5,23],3:[7.5,23],4:[7.5,20],5:[10,20],6:[10,23]}],
     ['vm-bilinski-01','Bilinski Lab (direct print; card reader?)','campus-bw','42.4799809','-76.4511259',None],
     ['vm-wiswall-01/vm-wiswall-02','Wiswall Lab (direct print; card reader?)','campus-bw','42.4799809','-76.4511259',None],
-    ['whitelab','White Hall - Room B10 (direct print; card reader?)','campus-bw','42.4502416','-76.4853705',None]
+    ['whitelab','White Hall - Room B10 (direct print; faculty and grads only)','campus-bw','42.4502416','-76.4853705',None]
 
 ]
 
@@ -125,7 +125,7 @@ printers_color = [
     ['aap-sib-1c','Sibley Hall - 3rd Floor Lab (Barclay Jones,None],','campus-bw, campus-color','42.4509802','-76.4840158',None],
     ['aap-sib-3c','Sibley Hall - 2nd Floor Lab (ADMS]) (direct print; card reader?)','campus-bw, campus-color','42.4509802','-76.4840158',None],
     ['aap-sib-3mfp/aap-sib-4c','Sibley Hall - 3rd Floor Balcony (inside dome) (direct print; card reader?)','campus-bw, campus-color','42.4509802','-76.4840158',None],
-    ['aap-tjaden-1c','Tjaden Hall - Darkroom (direct print; card reader?)','campus-bw, campus-color','42.4509025','-76.4853131',{0:[9,16],1:[9,16],2:[9,16],3:[9,16],4:[9,16],5:[0,0],6:[0,0]}],
+    ['aap-tjaden-1c','Tjaden Hall - Take elev. to 2W (broken as of spr 2019; direct print or card reader)','campus-bw, campus-color','42.4509025','-76.4853131',{0:[9,16],1:[9,16],2:[9,16],3:[9,16],4:[9,16],5:[0,0],6:[0,0]}],
     ['aep-netprint1','Clark Hall - Room 244 (AEP only) (direct print; card reader?)','campus-bw, campus-color','42.4497606','-76.4812001',None,],
     ['africana-1st-floor','Africana first floor','campus-bw, campus-color','42.457403','-76.482239',{0:[9,23],1:[9,23],2:[9,23],3:[9,23],4:[9,17],5:[13,17],6:[16,23]}],
     ['bin-color','Statler Hall 365 - by the lab monitor desk - closest to window','campus-bw, campus-color',42.4668288,-76.4851556,None],
@@ -141,7 +141,7 @@ printers_color = [
     ['cit-weill-1c','B25 Weill Hall - 237 Tower Road','campus-bw, campus-color','42.4468068','-76.477214',None],
     ['cit-wsh-3c','Willard Straight Hall - Computer Lab - Basement Level','campus-bw, campus-color','42.4465919','-76.4856765',{0:[9,16],1:[9,16],2:[9,16],3:[9,16],4:[9,16],5:[0,-1],6:[0,-1]}],
     ['ciw1','District of Columbia - Cornell in Washington','campus-bw, campus-color','38.908422','-77.048536',None],
-    ['csmenglab','Gates Hall - Room G23 (direct print; card reader?)','campus-bw, campus-color','42.4449769','-76.4810912',None],
+    ['csmenglab','Gates Hall - Room G23 (direct print; card reader? under construction as of Spr 2019)','campus-bw, campus-color','42.4449769','-76.4810912',None],
     #['fine-lib2c','Fine Arts Library - B56 Sibley Hall','campus-bw, campus-color','42.4512236','-76.4828622',{0:[9,19],1:[9,19],2:[9,19],3:[9,19],4:[9,17],5:[12,17],6:[13,19]}],
     ['hollister2c','Hollister 202 CEE Undergrad Lounge (direct print; card reader?)','campus-bw, campus-color','42.444368','-76.48463919999999',None],
     ['kroch-lib-2-mfp/kroch-lib-3-mfp','Kroch Library','campus-bw, campus-color','42.447774','-76.484160',{0:[8,26],1:[8,26],2:[8,26],3:[8,26],4:[8,22],5:[10,22],6:[10,26]}],
@@ -152,7 +152,7 @@ printers_color = [
     ['mann4c','Mann Library - First Floor','campus-bw, campus-color','42.448766','-76.47631179999999',{0:[8,24],1:[8,24],2:[8,24],3:[8,24],4:[8,18],5:[12,19],6:[12,24]}],
     ['mann5color','Mann Library - Basement B30 Area','campus-bw, campus-color','42.448766','-76.47631179999999',{0:[8,22],1:[8,22],2:[8,22],3:[8,22],4:[8,17],5:[0,0],6:[0,0]}],
     ['math-lib3c','Mallott Hall - Math Library - Fourth Floor','campus-bw, campus-color','42.4482224','-76.4802083',{0:[8,20],1:[8,20],2:[8,20],3:[8,20],4:[8,20],5:[0,0],6:[13,22]}],
-    ['mpslab','Gates Hall - Room G23 (direct print; card reader?)','campus-bw, campus-color','42.4449769','-76.4810912',None],
+    ['mpslab','Gates Hall - Room G23 (direct print; card reader? under construction as of Spr 2019)','campus-bw, campus-color','42.4449769','-76.4810912',None],
     ['mth-color','Myron Taylor Hall 2nd Floor Computer Lab (direct print; card reader?)','campus-bw, campus-color','42.444460','-76.486113',None],
     ['nytech-netprnt1','Roosevelt Island - Bloomberg Center Room 181 (direct print; card reader?)','campus-color','40.76050310000001','-73.9509934',None],
     ['nytech-netprnt2','NYTech - 111 8th Avenue (direct print; card reader?)','campus-color','42.4439614','-76.5018807',None],
