@@ -4,7 +4,7 @@
 # last modified Dec 25, 2018
 # free for personal use/distribution, ideally with these credits intact
 
-#      if automated upload performed correctly, this message will appear!
+#      if automated upload performed correctly, this message will appear
 
 '''
 
