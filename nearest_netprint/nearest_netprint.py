@@ -4,6 +4,8 @@
 # last modified Dec 25, 2018
 # free for personal use/distribution, ideally with these credits intact
 
+#      if automated upload performed correctly, this message will appear!
+
 '''
 
 When run on command line, prints a list of the nearest netprint-enabled printers
