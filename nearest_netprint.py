@@ -177,6 +177,8 @@ printers_color = [
 
 ]
 
+TIMEOUT = 15
+
 ############################
 
 '''Deprecated; function (and access key in __main__) left here for others' curiosity.'''
@@ -190,7 +192,7 @@ def find_me(key):
     longitude = geo_json['longitude']
     return (latitude,longitude)
 
-def find_me2(browser='S'):
+def find_me2(browser='S', quiet=False):
     '''Automatically open a Safari/Chrome window and extract GPS information.'''
     import selenium
     from selenium import webdriver
@@ -200,20 +202,36 @@ def find_me2(browser='S'):
         driver = webdriver.Safari()
     else:
         import os
-        driver = webdriver.Chrome(str(os.getcwd())+'/chromedriver')
+        source = str(os.getcwd())+'/chromedriver'
+        # print(source)
+        chrome_options = webdriver.ChromeOptions()
+        if quiet:
+            chrome_options.add_argument('--headless')
+        driver = webdriver.Chrome(source, options=chrome_options)
+
+    ERR_MESSAGE = 'Error finding your location. Check your internet connection.'
+    starttime = time.time()
     try:
         driver.get('https://www.gps-coordinates.net/')
         latlong = ''
-        while latlong == '':
-            time.sleep(1)
+        tick = time.time()
+        while latlong == '' and (time.time()-starttime < TIMEOUT):
+            time.sleep(.05)
             elem = driver.find_element_by_id('latlong')
             latlong = elem.get_attribute('value')
-            print('...')
+            tock = time.time()
+            if tock-tick >= 1:
+                tick = tock
+                print('...')
         driver.close()
+        if latlong == '':
+            print(ERR_MESSAGE)
+            print('Connection timed out. Try running without quiet mode.')
+            return
         return latlong
     except:
-        print('Error finding your location. Check your internet connection.\n'+
-                'You can also enter your coordinate manually (argv "manual")')
+        print(ERR_MESSAGE)
+        print('You can also enter your coordinate manually (argv "manual")')
         driver.close()
 
 
@@ -320,8 +338,9 @@ if __name__ == '__main__':
         msg = 'Searching for GPS info - please wait a few seconds.'
         msg += '\nIf browser requests any permissions, accept; otherwise don\'t touch computer.'
         print(msg)
-        if 'chrome' in args:
-            pos = find_me2(browser='C')
+        if 'chrome' or 'quiet' in args:
+            quiet = 'quiet' in args
+            pos = find_me2(browser='C', quiet=quiet)
         else:
             pos = find_me2()
 
