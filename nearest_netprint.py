@@ -32,6 +32,10 @@ from math import radians, cos, sin, asin, sqrt
 import datetime
 import time
 import webbrowser
+from selenium import webdriver
+import os
+from sys import argv
+from sys import exit
 
 
 # for each printer, store (0: name, 1: text-form location, 2: bw or color info, 3: decimal latitude, 4: decimal longitude, 5: schedule)
@@ -194,14 +198,9 @@ def find_me(key):
 
 def find_me2(browser='S', quiet=False):
     '''Automatically open a Safari/Chrome window and extract GPS information.'''
-    import selenium
-    from selenium import webdriver
-    from selenium.webdriver.common.keys import Keys
-    import os
     if browser=='S':
         driver = webdriver.Safari()
     else:
-        import os
         source = str(os.getcwd())+'/chromedriver'
         # print(source)
         chrome_options = webdriver.ChromeOptions()
@@ -217,8 +216,10 @@ def find_me2(browser='S', quiet=False):
         tick = time.time()
         while latlong == '' and (time.time()-starttime < TIMEOUT):
             time.sleep(.05)
-            elem = driver.find_element_by_id('latlong')
-            latlong = elem.get_attribute('value')
+            elems = driver.find_elements_by_id('latlong')
+            if len(elems)>0:
+                elem = elems[0]
+                latlong = elem.get_attribute('value')
             tock = time.time()
             if tock-tick >= 1:
                 tick = tock
@@ -312,8 +313,6 @@ def bw(args):
 
 
 if __name__ == '__main__':
-    from sys import argv
-    from sys import exit
     args = [i.lower() for i in argv]
 
     # num_printers is the only numerical argv, so any int is num_printers. defaults to 5.
@@ -346,8 +345,7 @@ if __name__ == '__main__':
 
         # give up if selenium error occurs
         if pos is None:
-            import sys
-            sys.exit(0)
+            exit(0)
         print('Found!')
         pos = [float(i) for i in pos.split(',')]
     '''except:
