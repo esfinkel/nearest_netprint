@@ -34,8 +34,7 @@ import time
 import webbrowser
 from selenium import webdriver
 import os
-from sys import argv
-from sys import exit
+import sys
 
 
 # for each printer, store (0: name, 1: text-form location, 2: bw or color info, 3: decimal latitude, 4: decimal longitude, 5: schedule)
@@ -223,8 +222,10 @@ def find_me2(browser='S', quiet=False):
             tock = time.time()
             if tock-tick >= 1:
                 tick = tock
-                print('...')
+                sys.stdout.write('... ')
+                sys.stdout.flush()
         driver.close()
+        print('')
         if latlong == '':
             print(ERR_MESSAGE)
             print('Connection timed out. Try running without quiet mode.')
@@ -313,7 +314,7 @@ def bw(args):
 
 
 if __name__ == '__main__':
-    args = [i.lower() for i in argv]
+    args = [i.lower() for i in sys.argv]
 
     # num_printers is the only numerical argv, so any int is num_printers. defaults to 5.
     NUM_PRINTERS_WANTED = 5
@@ -332,7 +333,7 @@ if __name__ == '__main__':
         prompt += '\ntry https://www.gps-coordinates.net/\n0 to cancel\nCoors: '
         pos = [float(i.strip()) for i in input(prompt).split(',')]
         if pos == [0]:
-            exit()
+            sys.exit()
     else:
         msg = 'Searching for GPS info - please wait a few seconds.'
         msg += '\nIf browser requests any permissions, accept; otherwise don\'t touch computer.'
@@ -345,7 +346,7 @@ if __name__ == '__main__':
 
         # give up if selenium error occurs
         if pos is None:
-            exit(0)
+            sys.exit(0)
         print('Found!')
         pos = [float(i) for i in pos.split(',')]
     '''except:
