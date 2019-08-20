@@ -1,4 +1,4 @@
-# nearest_netprint.py
+# nearest_netprint.py 
 # by Elisabeth Finkel (finkelelisabeth@gmail.com ; esf76@cornell.edu)
 # written May 28, 2018
 # last modified Dec 25, 2018
