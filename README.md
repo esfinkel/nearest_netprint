@@ -1,5 +1,9 @@
 # nearest_netprint
 
+## DEPRECATED
+Data is somewhat deprecated in favor of "[Netprint Finder](https://github.com/esfinkel/netprint-finder)". Functionality is intact.
+
+### Description
 Python-based project.
 
 When run on command line, prints a list of the nearest netprint-enabled printers offered by Cornell.
